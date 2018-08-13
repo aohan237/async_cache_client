@@ -1,8 +1,7 @@
 import asyncio
-import time
-import json
-from async_sql_cache.cache.redis import RedisCache
-from async_sql_cache.sql.mysql import MysqlClient
+import yaml
+from ..cache.redis import RedisCache
+from ..sql.mysql import MysqlClient
 from .base import ClientBase
 
 
@@ -19,14 +18,16 @@ class SimpleClient(ClientBase):
     async def connect(self):
         await self.sql.connect()
         await self.cache.connect()
-        self.loop.create_task(self.auto_update())
+        self.loop.create_task(self.init_period_auto_update())
 
     async def set(self, database=None, key=None, expire_at=None):
         result = await self.sql.get(key)
-        result = json.dumps(result)
-        await self.cache.set(
-            database=database, key=key,
-            expire_at=expire_at, value=result)
+        result1 = yaml.dump(result)
+        cache_valid = await self.cache.valid
+        if cache_valid:
+            await self.cache.set(
+                database=database, key=key,
+                expire_at=expire_at, value=result1)
         return result
 
     async def get(self, database=None, key=None, expire_at=None):
@@ -40,7 +41,7 @@ class SimpleClient(ClientBase):
             return await self.set(
                 database=database, key=key, expire_at=expire_at)
 
-    async def auto_update(self):
+    async def init_period_auto_update(self):
         print('auto update task')
         while True:
             update_data = await self.cache.get_update_data()

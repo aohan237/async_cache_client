@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 
 class CacheBase(metaclass=ABCMeta):
@@ -26,4 +26,8 @@ class CacheBase(metaclass=ABCMeta):
 
     @abstractmethod
     def exist(self):
+        return NotImplemented
+
+    @abstractproperty
+    def valid(self):
         return NotImplemented

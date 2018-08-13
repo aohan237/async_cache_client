@@ -21,5 +21,5 @@ class ClientBase(metaclass=ABCMeta):
         return NotImplemented
 
     @abstractmethod
-    def auto_update(self):
+    def init_period_auto_update(self):
         return NotImplemented

@@ -1,8 +1,7 @@
 import aioredis
-from aioredis.commands.sorted_set import SortedSetCommandsMixin
-import json
+import yaml
 import time
-import logging
+from aioredis.commands.sorted_set import SortedSetCommandsMixin
 from .base import CacheBase
 
 
@@ -18,9 +17,22 @@ class RedisCache(CacheBase):
         )
         self.cached_set_postfix = cached_set_postfix or ':zset'
         self._cached_key = cached_key or 'RedisCache'
+        self.peak = kwargs.get('peak', 80)
 
     async def connect(self):
         self.pool = await self._create_pool
+
+    @property
+    async def valid(self):
+        info = await self.pool.info()
+        try:
+            check = info['used_memory'] / info['total_system_memory'] * 100
+        except Exception as tmp:
+            check = 100
+        if check < self.peak:
+            return True
+        else:
+            return False
 
     async def add_to_regulate_set(
             self, database=None,
@@ -33,7 +45,6 @@ class RedisCache(CacheBase):
         if exist:
             if expire_at:
                 tmp = await self.pool.zadd(database, expire_at, key)
-                print('update expire', database, expire_at, key, tmp)
             return True
         else:
             expire_at = expire_at or int(time.time()) + 300
@@ -54,7 +65,7 @@ class RedisCache(CacheBase):
     async def get(self, database=None, key=None):
         result_byte = await self.pool.hget(database, key)
         try:
-            result = json.loads(result_byte)
+            result = yaml.load(result_byte)
         except Exception as tmp:
             result = result_byte.decode() if result_byte else {}
         return result
