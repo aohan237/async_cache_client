@@ -1,3 +1,19 @@
+# Cache-Client
+
+[![Downloads](https://pepy.tech/badge/cache-client)](https://pepy.tech/project/cache-client)
+
+## Cache-Client
+
+most of the time, you need cache to some kind of backend to speed up your app.
+
+this framework add these tools to free you from write these.
+
+it also has auto update function to free you from manually update something.
+
+
+## Usage
+
+```python
 from logging import StreamHandler
 import asyncio
 import time
@@ -50,3 +66,12 @@ loop = asyncio.get_event_loop()
 
 loop.create_task(test())
 loop.run_forever()
+```
+
+## Coding
+
+* **like this project, star it**
+* **any suggestion is welcome**
+* **this project is under MIT lisense**
+
+more docs are writing.

@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class SqlBase(metaclass=ABCMeta):
+class BackendBase(metaclass=ABCMeta):
     def __init__(name=None, config=None, **kwargs):
         pass
 
